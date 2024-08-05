@@ -1,12 +1,21 @@
-import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { AppRoutes } from 'components/routes/private-routes';
+import { AppRoutes } from "components/routes/private-routes";
+import { ThemeProvider } from "components/theme";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
+import { BrowserRouter as Router } from "react-router-dom";
+
+const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 

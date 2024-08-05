@@ -1,52 +1,73 @@
 import { fetchComments, fetchTodos, fetchUsers } from "api/requests";
 import "bootstrap/dist/css/bootstrap.min.css";
-import useLazyLoader from "components/lazyloader";
 import { useTheme } from "components/theme";
+import { useEffect, useState } from "react";
 import { Bar, Line, Pie } from "react-chartjs-2";
 import "styles/dash/index.css";
+import { Chart, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+
+
+Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
+
 
 const Dashboard = () => {
-  const {
-    data: users,
-    isLoading: usersLoading,
-    error: usersError,
-  } = useLazyLoader(fetchUsers, true);
-  const {
-    data: todos,
-    isLoading: todosLoading,
-    error: todosError,
-  } = useLazyLoader(fetchTodos, true);
-  const {
-    data: comments,
-    isLoading: commentsLoading,
-    error: commentsError,
-  } = useLazyLoader(fetchComments, true);
+  const [users, setUsers] = useState<any[] | null>(null);
+  const [todos, setTodos] = useState<any[] | null>(null);
+  const [comments, setComments] = useState<any[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const { theme } = useTheme();
 
-  if (usersLoading || todosLoading || commentsLoading)
-    return <div>Loading...</div>;
-  if (usersError) return <div>{usersError.message}</div>;
-  if (todosError) return <div>{todosError.message}</div>;
-  if (commentsError) return <div>{commentsError.message}</div>;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [usersData, todosData, commentsData] = await Promise.all([
+          fetchUsers(),
+          fetchTodos(),
+          fetchComments(),
+        ]);
+        setUsers(usersData);
+        setTodos(todosData);
+        setComments(commentsData);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   const userCounts = users ? users.length : 0;
   const todoCounts = todos ? todos.length : 0;
   const commentCounts = comments ? comments.length : 0;
 
   const todoCompletionData = {
-    labels: todos ? todos.slice(0, 10).map((todo: { title: any; }) => todo.title) : [],
+    labels: todos
+      ? todos.slice(0, 10).map((todo: { title: string }) => todo.title)
+      : [],
     datasets: [
       {
         label: "Completed",
         data: todos
-          ? todos.slice(0, 10).map((todo: { completed: any; }) => (todo.completed ? 1 : 0))
+          ? todos
+              .slice(0, 10)
+              .map((todo: { completed: boolean }) => (todo.completed ? 1 : 0))
           : [],
         backgroundColor: "rgba(75, 192, 192, 0.6)",
       },
       {
         label: "Pending",
         data: todos
-          ? todos.slice(0, 10).map((todo: { completed: any; }) => (todo.completed ? 0 : 1))
+          ? todos
+              .slice(0, 10)
+              .map((todo: { completed: boolean }) => (todo.completed ? 0 : 1))
           : [],
         backgroundColor: "rgba(255, 99, 132, 0.6)",
       },
@@ -54,17 +75,21 @@ const Dashboard = () => {
   };
 
   const userActivityData = {
-    labels: users ? users.slice(0, 10).map((user: { username: any; }) => user.username) : [],
+    labels: users
+      ? users.slice(0, 10).map((user: { username: string }) => user.username)
+      : [],
     datasets: [
       {
         label: "Number of Comments",
         data: users
           ? users
               .slice(0, 10)
-              .map((user: { email: any; }) =>
+              .map((user: { email: string }) =>
                 comments
-                  ? comments.filter((comment: { email: any; }) => comment.email === user.email)
-                      .length
+                  ? comments.filter(
+                      (comment: { email: string }) =>
+                        comment.email === user.email
+                    ).length
                   : 0
               )
           : [],
@@ -79,8 +104,14 @@ const Dashboard = () => {
       {
         label: "Todo Status",
         data: [
-          todos ? todos.filter((todo: { completed: any; }) => todo.completed).length : 0,
-          todos ? todos.filter((todo: { completed: any; }) => !todo.completed).length : 0,
+          todos
+            ? todos.filter((todo: { completed: boolean }) => todo.completed)
+                .length
+            : 0,
+          todos
+            ? todos.filter((todo: { completed: boolean }) => !todo.completed)
+                .length
+            : 0,
         ],
         backgroundColor: ["rgba(54, 162, 235, 0.6)", "rgba(255, 99, 132, 0.6)"],
       },

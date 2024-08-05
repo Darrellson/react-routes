@@ -6,38 +6,17 @@ import {
 } from "@react-google-maps/api";
 import { fetchUsers } from "api/requests";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {
-  ArcElement,
-  BarElement,
-  CategoryScale,
-  Chart,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-} from "chart.js";
-import useLazyLoader from "components/lazyloader";
 import { useTheme } from "components/theme";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import "styles/map/index.css";
 
-Chart.register(
-  CategoryScale,
-  ArcElement,
-  LinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  PointElement,
-  LineElement
-);
+
 
 const MapPage = () => {
-  const { data: users, isLoading, error } = useLazyLoader(fetchUsers, true);
+  const [users, setUsers] = useState<any[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [markers, setMarkers] = useState<
     { id: number; lat: number; lng: number }[]
   >([]);
@@ -45,10 +24,26 @@ const MapPage = () => {
   const { theme } = useTheme();
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const usersData = await fetchUsers();
+        setUsers(usersData);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     if (users) {
       const userMarkers = users
-        .filter((user) => user.address?.geo?.lat && user.address?.geo?.lng)
-        .map((user) => ({
+        .filter((user: any) => user.address?.geo?.lat && user.address?.geo?.lng)
+        .map((user: any) => ({
           id: user.id,
           lat: parseFloat(user.address?.geo?.lat ?? "0"),
           lng: parseFloat(user.address?.geo?.lng ?? "0"),
@@ -81,7 +76,7 @@ const MapPage = () => {
   }, [sortedLatitudes, sortedLongitudes]);
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error.message}</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className={`map-page ${theme === "dark" ? "text-light" : ""}`}>
@@ -111,10 +106,7 @@ const MapPage = () => {
                         {markers.map((marker) => (
                           <Marker
                             key={marker.id}
-                            position={{
-                              lat: marker.lat,
-                              lng: marker.lng,
-                            }}
+                            position={{ lat: marker.lat, lng: marker.lng }}
                             clusterer={clusterer}
                           />
                         ))}
