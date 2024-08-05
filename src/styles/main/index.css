@@ -1,0 +1,15 @@
+.app-container {
+  display: flex;
+}
+
+.nav-menu {
+  width: 200px;
+  border-right: 1px solid #ccc;
+  padding: 10px;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 10px;
+  position: relative;
+}

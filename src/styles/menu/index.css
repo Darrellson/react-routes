@@ -1,0 +1,28 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+.navbar-nav {
+  display: flex;
+  flex-direction: row;
+}
+
+.nav-item {
+  margin-right: 15px;
+}
+
+.nav-link {
+  color: #000;
+}
+
+.nav-link.active {
+  font-weight: bold;
+  color: #007bff;
+}
+.container {
+  padding-top: 50px;
+}
+

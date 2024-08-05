@@ -1,0 +1,50 @@
+.profile-card {
+  display: flex;
+  flex-direction: row;
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-card .card-body {
+  padding: 1rem;
+}
+
+.profile-card .card-img-top {
+  border-radius: 50%;
+  margin: 1rem;
+}
+
+.profile-card .card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.profile-card .card-text {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-card .btn {
+  margin-top: 1rem;
+}
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: gray;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.back-button:hover {
+  color: gray;
+}
+
+.profile-card .card-body {
+  position: relative;
+}
