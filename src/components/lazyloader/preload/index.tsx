@@ -9,11 +9,11 @@ import {
 import { LazyExoticComponent } from "react";
 
 // Define a type for components that can be lazily loaded
-type PreloadableComponent = LazyExoticComponent<() => JSX.Element> & {
+type PreloadComponent = LazyExoticComponent<() => JSX.Element> & {
   preload?: () => Promise<void>;
 };
 
-const components: PreloadableComponent[] = [
+const components: PreloadComponent[] = [
   Dashboard,
   Login,
   MapPage,
