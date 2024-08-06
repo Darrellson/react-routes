@@ -1,68 +1,90 @@
-import React, { Suspense } from 'react';
-import { Navigate, RouteObject, useRoutes } from 'react-router-dom';
-import Layout from 'components/layout';
-import lazyLoader from 'components/lazyloader';
-import PublicRoute from 'components/routes/public-routes';
-import NotFound from 'not-found/index';
+import Layout from "components/layout";
+import PublicRoute from "components/routes/public-routes";
+import NotFound from "not-found/index";
+import { lazy, Suspense } from "react";
+import { Navigate, RouteObject, useRoutes } from "react-router-dom";
 
-export const Dashboard = lazyLoader(() => import('pages/dashboard'));
-export const Login = lazyLoader(() => import('pages/login'));
-export const MapPage = lazyLoader(() => import('pages/map'));
-export const Register = lazyLoader(() => import('pages/registration'));
-export const Users = lazyLoader(() => import('pages/users'));
-export const UserDetails = lazyLoader(() => import('pages/users/user-details'));
+export const Dashboard = lazy(() => import("pages/dashboard"));
+export const Login = lazy(() => import("pages/login"));
+export const MapPage = lazy(() => import("pages/map"));
+export const Register = lazy(() => import("pages/registration"));
+export const Users = lazy(() => import("pages/users"));
+export const UserDetails = lazy(() => import("pages/users/user-details"));
 
 type PrivateRouteProps = {
-  element: JSX.Element;
+  children: JSX.Element;
 };
 
-const PrivateRoute = ({ element }: PrivateRouteProps) => {
-  const isAuthenticated = Boolean(localStorage.getItem('authenticated'));
-  return isAuthenticated ? element : <Navigate to="/login" />;
+const PrivateRoute = ({ children }: PrivateRouteProps) => {
+  const isAuthenticated = Boolean(localStorage.getItem("authenticated"));
+  return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
 const Main = () => <Layout />;
 
 const RoutesConfig: RouteObject[] = [
   {
-    path: '/',
+    path: "/",
     element: <Main />,
     children: [
-      { path: '/', element: <Navigate to="/login" /> },
-      { path: 'login', element: <PublicRoute element={<Login.Component />} /> },
+      { path: "/", element: <Navigate to="/login" /> },
       {
-        path: 'register',
-        element: <PublicRoute element={<Register.Component />} />,
+        path: "login",
+        element: (
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        ),
       },
       {
-        path: 'dashboard',
-        element: <PrivateRoute element={<Dashboard.Component />} />,
+        path: "register",
+        element: (
+          <PublicRoute>
+            <Register />
+          </PublicRoute>
+        ),
       },
       {
-        path: 'map',
-        element: <PrivateRoute element={<MapPage.Component />} />,
+        path: "dashboard",
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
       },
       {
-        path: 'users',
-        element: <PrivateRoute element={<Users.Component />} />,
+        path: "map",
+        element: (
+          <PrivateRoute>
+            <MapPage />
+          </PrivateRoute>
+        ),
       },
       {
-        path: 'user/:userId',
-        element: <PrivateRoute element={<UserDetails.Component />} />,
+        path: "users",
+        element: (
+          <PrivateRoute>
+            <Users />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "user/:userId",
+        element: (
+          <PrivateRoute>
+            <UserDetails />
+          </PrivateRoute>
+        ),
       },
     ],
   },
-  { path: '*', element: <NotFound /> },
+  { path: "*", element: <NotFound /> },
 ];
 
 const AppRoutes = () => {
   const routes = useRoutes(RoutesConfig);
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      {routes}
-    </Suspense>
-  );
+  return <Suspense fallback={<div>Loading...</div>}>{routes}</Suspense>;
 };
 
 export { AppRoutes, PrivateRoute };
