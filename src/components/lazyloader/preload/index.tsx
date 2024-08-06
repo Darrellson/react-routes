@@ -3,17 +3,29 @@ import {
   Login,
   MapPage,
   Register,
+  UserDetails,
+  Users,
+} from "components/routes/private-routes";
+import { LazyExoticComponent } from "react";
+
+// Define a type for components that can be lazily loaded
+type PreloadableComponent = LazyExoticComponent<() => JSX.Element> & {
+  preload?: () => Promise<void>;
+};
+
+const components: PreloadableComponent[] = [
+  Dashboard,
+  Login,
+  MapPage,
+  Register,
   Users,
   UserDetails,
-} from "components/routes/private-routes";
+];
 
 export const preloadComponents = async () => {
-  await Promise.all([
-    (Dashboard as any).preload(),
-    (Login as any).preload(),
-    (MapPage as any).preload(),
-    (Register as any).preload(),
-    (Users as any).preload(),
-    (UserDetails as any).preload(),
-  ]);
+  await Promise.all(
+    components.map((component) =>
+      component.preload ? component.preload() : Promise.resolve()
+    )
+  );
 };

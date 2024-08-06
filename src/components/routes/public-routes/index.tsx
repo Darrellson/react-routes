@@ -1,10 +1,6 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
 
-type PublicRouteProps = {
-  children: JSX.Element;
-};
-
-const PublicRoute = ({ children }: PublicRouteProps) => {
+const PublicRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = Boolean(localStorage.getItem("authenticated"));
   return !isAuthenticated ? children : <Navigate to="/dashboard" />;
 };

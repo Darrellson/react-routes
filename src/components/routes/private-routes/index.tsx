@@ -4,24 +4,24 @@ import NotFound from "not-found/index";
 import { lazy, Suspense } from "react";
 import { Navigate, RouteObject, useRoutes } from "react-router-dom";
 
-export const Dashboard = lazy(() => import("pages/dashboard"));
-export const Login = lazy(() => import("pages/login"));
-export const MapPage = lazy(() => import("pages/map"));
-export const Register = lazy(() => import("pages/registration"));
-export const Users = lazy(() => import("pages/users"));
-export const UserDetails = lazy(() => import("pages/users/user-details"));
+// Lazy-loaded pages
+const Dashboard = lazy(() => import("pages/dashboard"));
+const Login = lazy(() => import("pages/login"));
+const MapPage = lazy(() => import("pages/map"));
+const Register = lazy(() => import("pages/registration"));
+const Users = lazy(() => import("pages/users"));
+const UserDetails = lazy(() => import("pages/users/user-details"));
 
-type PrivateRouteProps = {
-  children: JSX.Element;
-};
-
-const PrivateRoute = ({ children }: PrivateRouteProps) => {
+// Private Route component
+const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const isAuthenticated = Boolean(localStorage.getItem("authenticated"));
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
+// Layout component
 const Main = () => <Layout />;
 
+// Route configuration
 const RoutesConfig: RouteObject[] = [
   {
     path: "/",
@@ -81,10 +81,20 @@ const RoutesConfig: RouteObject[] = [
   { path: "*", element: <NotFound /> },
 ];
 
+// Main App Routes component with Suspense
 const AppRoutes = () => {
   const routes = useRoutes(RoutesConfig);
 
   return <Suspense fallback={<div>Loading...</div>}>{routes}</Suspense>;
 };
 
-export { AppRoutes, PrivateRoute };
+export {
+  AppRoutes,
+  PrivateRoute,
+  Dashboard,
+  Login,
+  MapPage,
+  Register,
+  UserDetails,
+  Users,
+};
