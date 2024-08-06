@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { EMAIL_REGEX } from "components/validators/emailValidator";
 
 const useFormControl = (initialFormData: { [key: string]: string }) => {
   const [formData, setFormData] = useState(initialFormData);
@@ -10,15 +11,10 @@ const useFormControl = (initialFormData: { [key: string]: string }) => {
     setErrors({ ...errors, [name]: "" });
   };
 
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  };
-
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
-    if (!validateEmail(formData.email)) {
+    if (!EMAIL_REGEX.test(formData.email)) {
       newErrors.email = "Invalid email format";
     }
 
@@ -41,6 +37,7 @@ const useFormControl = (initialFormData: { [key: string]: string }) => {
     errors,
     handleChange,
     validateForm,
+    setErrors,
   };
 };
 

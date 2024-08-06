@@ -1,6 +1,8 @@
-import useFormControl from "components/controller/useregcontrol";
+import { useState } from "react";
+import { EMAIL_REGEX } from "components/validators/emailValidator";
 import { encryptPassword } from "helpers/index";
-import React, { useState } from "react";
+import useFormControl from "components/controller/useregcontrol";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Tooltip, OverlayTrigger } from "react-bootstrap";
@@ -35,13 +37,22 @@ const Register = () => {
     password: "",
   };
 
-  const { formData, errors, handleChange, validateForm } =
+  const { formData, errors, handleChange, validateForm, setErrors } =
     useFormControl(initialFormData);
   const navigate = useNavigate();
   const { theme } = useTheme();
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Additional client-side validation for email
+    if (!EMAIL_REGEX.test(formData.email)) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        email: "Invalid email format",
+      }));
+      return;
+    }
 
     if (!validateForm()) {
       return;
@@ -75,20 +86,20 @@ const Register = () => {
   const handleNumericChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // Validate if the input is numeric for specific fields
     if (name === "age" || name === "dateOfBirth") {
       if (!/^\d*$/.test(value)) {
         setTooltipVisible((prev) => ({ ...prev, [name]: true }));
-        // Optionally you can add more specific error messages
-        errors[name] = "Please enter a valid number";
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: "Please enter a valid number",
+        }));
         return;
       } else {
         setTooltipVisible((prev) => ({ ...prev, [name]: false }));
-        errors[name] = "";
+        setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
       }
     }
 
-    // Update form data
     handleChange(e);
   };
 
@@ -139,7 +150,7 @@ const Register = () => {
                     id={key}
                     name={key}
                     value={value}
-                    onChange={handleNumericChange} // Use the updated handler
+                    onChange={handleNumericChange}
                     required
                   />
                 </OverlayTrigger>

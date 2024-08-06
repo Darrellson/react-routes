@@ -1,13 +1,13 @@
 import bcrypt from "bcryptjs";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { EMAIL_REGEX } from "components/validators/emailValidator"; // Import EMAIL_REGEX
 import useFormController from "components/controller/uselogcontrol";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { useTheme } from 'components/theme/index';
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { useTheme } from "components/theme/index";
+import { validateUser } from "components/validators/userValidator";
 
 type FormData = {
   email: string;
@@ -30,21 +30,13 @@ const getStoredCredentials = () => {
   return null;
 };
 
-const comparePassword = (
-  inputPassword: string,
-  storedPassword: string
-): boolean => {
-  return bcrypt.compareSync(inputPassword, storedPassword);
-};
-
 const loginUser = async (data: FormData) => {
   const storedUser = getStoredCredentials();
   const { email, password } = data;
 
   if (
     storedUser &&
-    email === storedUser.email &&
-    comparePassword(password, storedUser.password)
+    validateUser(email, password, storedUser.email, storedUser.password)
   ) {
     return { success: true };
   } else {
@@ -100,14 +92,25 @@ const Login = () => {
   });
 
   return (
-    <div className={`container d-flex justify-content-center mt-5 ${theme === 'dark' ? 'bg-dark text-light' : ''}`}>
-      <div className={`card shadow-sm ${theme === 'dark' ? 'bg-secondary text-light' : 'bg-light'} border-${theme === 'dark' ? 'light' : 'dark'}`} style={{ maxWidth: '400px', width: '100%' }}>
+    <div
+      className={`container d-flex justify-content-center mt-5 ${
+        theme === "dark" ? "bg-dark text-light" : ""
+      }`}
+    >
+      <div
+        className={`card shadow-sm ${
+          theme === "dark" ? "bg-secondary text-light" : "bg-light"
+        } border-${theme === "dark" ? "light" : "dark"}`}
+        style={{ maxWidth: "400px", width: "100%" }}
+      >
         <div className="card-body">
           <h4 className="card-title mb-4 text-center">Login</h4>
           {error && <div className="alert alert-danger">{error}</div>}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email</label>
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
               <input
                 type="email"
                 id="email"
@@ -119,19 +122,27 @@ const Login = () => {
               )}
             </div>
             <div className="mb-3">
-              <label htmlFor="password" className="form-label">Password</label>
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
               <input
                 type="password"
                 id="password"
-                className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                className={`form-control ${
+                  errors.password ? "is-invalid" : ""
+                }`}
                 {...passwordField}
               />
               {errors.password && (
-                <div className="invalid-feedback">{errors.password.message}</div>
+                <div className="invalid-feedback">
+                  {errors.password.message}
+                </div>
               )}
             </div>
             <div className="d-grid">
-              <button type="submit" className="btn btn-primary">Login</button>
+              <button type="submit" className="btn btn-primary">
+                Login
+              </button>
             </div>
             <div className="mt-3 text-center">
               <p>
