@@ -15,15 +15,12 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 type ThemeProviderProps = {
   children: ReactNode;
-}
+};
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setTheme] = useState<string>(() => {
-    return localStorage.getItem("theme") || "light";
-  });
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const [theme, setTheme] = useState<string>("light");
 
   useEffect(() => {
-    localStorage.setItem("theme", theme);
     document.body.className = theme === "dark" ? "dark-mode" : "";
   }, [theme]);
 
